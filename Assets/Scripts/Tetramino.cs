@@ -20,11 +20,11 @@ public struct TetraminoTile
 {
     public Tetraminos tetramino;
     public Tile tile;
-    public Vector2Int[] cell;
+    public Vector2Int[] cells { get; set; }
 
     public void Initialize()
     {
-        
+        this.cells = CellData.Cells[this.tetramino];
     }
 
 }

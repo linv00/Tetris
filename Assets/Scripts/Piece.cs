@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour
 {
-    public Grid board { get; set; }
+    public Board board { get; set; }
     public TetraminoTile data { get; set; }
     public Vector3Int[] cells { get; set; }
     public Vector3Int position { get; set; }
 
-    public void Initialize(Grid board, Vector3Int position, TetraminoTile data)
+    public void Initialize(Board board, Vector3Int position, TetraminoTile data)
     {
         this.board = board;
         this.position = position;
@@ -17,8 +17,12 @@ public class Piece : MonoBehaviour
 
         if (this.cells == null)
         {
-            this.cells = new Vector3Int[data.cell.Length];
+            this.cells = new Vector3Int[data.cells.Length];
         }
 
+        for (int i = 0; i < this.cells.Length; i++)
+        {
+            this.cells[i] = (Vector3Int)data.cells[i];
+        }
     }
 }
