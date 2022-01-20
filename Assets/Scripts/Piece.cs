@@ -9,6 +9,7 @@ public class Piece : MonoBehaviour
     public TetraminoTile data { get; set; }
     public Vector3Int[] cells { get; set; }
     public Vector3Int position { get; set; }
+    public int tetraNum;
 
     bool isInit = false;
     private float timer = 0;
@@ -20,7 +21,6 @@ public class Piece : MonoBehaviour
         this.board = board;
         this.position = position;
         this.data = data;
-
   
         if (this.cells == null)
         {
@@ -36,6 +36,7 @@ public class Piece : MonoBehaviour
 
     private void UpdateTile(Vector3Int newPosition)
     {
+        this.board.Clear(this);
         this.position = newPosition;
         this.board.Set(this);
     }
@@ -71,26 +72,29 @@ public class Piece : MonoBehaviour
 
     public void Step()
     {
-        this.board.Clear(this);
         Vector3Int newPosition = position;
         newPosition.y--;
-        UpdateTile(newPosition);
+        if (board.IsValidPos(newPosition, this))
+            UpdateTile(newPosition);
+        else return;
     }
 
     public void MoveRight()
     {
-        this.board.Clear(this);
         Vector3Int newPosition = position;
         newPosition.x++;
-        UpdateTile(newPosition);
+        if (board.IsValidPos(newPosition, this))
+            UpdateTile(newPosition);
+        else return;
     }
 
     public void MoveLeft()
     {
-        this.board.Clear(this);
         Vector3Int newPosition = position;
         newPosition.x--;
-        UpdateTile(newPosition);
+        if (board.IsValidPos(newPosition, this))
+            UpdateTile(newPosition);
+        else return;
     }
 
     public void MoveDown()
@@ -106,31 +110,41 @@ public class Piece : MonoBehaviour
     public void Rotate()
     {
         this.board.Clear(this);
+        Vector3Int[] cell = new Vector3Int[this.cells.Length];
+
+ 
         if (this.data.tetramino != Tetraminos.O)
         {
             for (int i = 0; i < this.cells.Length; i++)
             {
-                Vector3Int cell = this.cells[i];
-
+                cell[i] = this.cells[i];
                 int x, y;
                 if (isRotate == -1)
                 {
-                    x = Mathf.RoundToInt((cell.x * CellData.rotateRightMatrix[0]) + (cell.y * CellData.rotateRightMatrix[1]));
-                    y = Mathf.RoundToInt((cell.x * CellData.rotateRightMatrix[2]) + (cell.y * CellData.rotateRightMatrix[3]));
-                    this.cells[i] = new Vector3Int(x, y, 0);
+                    x = Mathf.RoundToInt((cells[i].x * CellData.rotateRightMatrix[0]) + (cells[i].y * CellData.rotateRightMatrix[1]));
+                    y = Mathf.RoundToInt((cells[i].x * CellData.rotateRightMatrix[2]) + (cells[i].y * CellData.rotateRightMatrix[3]));
                 }
                 else
                 {
-                    x = Mathf.RoundToInt((cell.x * CellData.rotateLeftMatrix[0]) + (cell.y * CellData.rotateLeftMatrix[1]));
-                    y = Mathf.RoundToInt((cell.x * CellData.rotateLeftMatrix[2]) + (cell.y * CellData.rotateLeftMatrix[3]));
-                    this.cells[i] = new Vector3Int(x, y, 0);
+                    x = Mathf.RoundToInt((cells[i].x * CellData.rotateLeftMatrix[0]) + (cells[i].y * CellData.rotateLeftMatrix[1]));
+                    y = Mathf.RoundToInt((cells[i].x * CellData.rotateLeftMatrix[2]) + (cells[i].y * CellData.rotateLeftMatrix[3]));
                 }
-                
-
+                this.cells[i].x = x;
+                this.cells[i].y = y;
             }
+        }
+
+        if (board.IsValidPos(position, this))
+        {
+            UpdateTile(position);
             if (this.data.tetramino != Tetraminos.L && this.data.tetramino != Tetraminos.J && this.data.tetramino != Tetraminos.T)
                 isRotate *= -1;
+        }   
+        else
+        {
+            this.cells = cell;
+            this.board.Set(this);
+            return;
         }
-        UpdateTile(position);
     }
 }

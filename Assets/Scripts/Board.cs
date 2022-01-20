@@ -9,10 +9,13 @@ public class Board : MonoBehaviour
     public TetraminoTile[] tetraminos;
     public Piece activePiece { get; set; }
     public Vector3Int spawnPosition = new Vector3Int (4, 0, 0);
-    public int activePieceNum;
 
-    private static readonly int height = 20;
-    private static readonly int width = 10;
+    public static readonly int height = 20;
+    public static readonly int width = 10;
+    public int leftBorder = 0;
+    public int rightBorder = 9;
+    public int upperBorder = 19;
+    public int lowerBorder = 0;
     public int[,] currentBoard = new int[ width, height ];
 
 
@@ -40,19 +43,20 @@ public class Board : MonoBehaviour
 
     public void Spawn()
     {
-        activePieceNum = Random.Range(0, this.tetraminos.Length);
-        TetraminoTile newTile = this.tetraminos[activePieceNum];
+        int rand = Random.Range(0, this.tetraminos.Length);
+        TetraminoTile newTile = this.tetraminos[rand];
         this.activePiece.Initialize(this, this.spawnPosition, newTile);
+        this.activePiece.tetraNum = rand;
         Set(this.activePiece);
     }
 
     public void Set(Piece piece)
     {
-        for (int i = 0; i < piece.cells.Length; i++)
+        if (IsValidPos(piece.position, piece))
         {
-            Vector3Int currentPosition = piece.cells[i] + piece.position;
-            if (ValidOnUp(currentPosition))
+            for (int i = 0; i < piece.cells.Length; i++)
             {
+                Vector3Int currentPosition = piece.cells[i] + piece.position;
                 this.tilemap.SetTile(currentPosition, piece.data.tile);
             }
         }
@@ -60,22 +64,27 @@ public class Board : MonoBehaviour
 
     public void Clear(Piece piece)
     {
-        for (int i = 0; i < piece.cells.Length; i++)
+        if (IsValidPos(piece.position, piece))
         {
-            Vector3Int tilePosition = piece.cells[i] + piece.position;
-            if (ValidOnUp(tilePosition))
+            for (int i = 0; i < piece.cells.Length; i++)
             {
+                Vector3Int tilePosition = piece.cells[i] + piece.position;
                 this.tilemap.SetTile(tilePosition, null);
             }
         }
     }
 
-    public bool ValidOnUp(Vector3Int position)
+    public bool IsValidPos(Vector3Int position, Piece piece)
     {
-        if (position.y < 1)
+        Vector3Int currentPosition;
+        for (int i = 0; i < piece.cells.Length; i++)
         {
-            return true;
+            currentPosition = piece.cells[i] + position;
+            if (currentPosition.x <= leftBorder || currentPosition.x >= rightBorder)
+                return false;
+            if (currentPosition.y >= upperBorder || currentPosition.y <= lowerBorder)
+                return false;
         }
-        else return false;
+        return true;
     }
 }
