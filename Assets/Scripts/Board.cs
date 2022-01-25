@@ -21,8 +21,8 @@ public class Board : MonoBehaviour
 
     public float speed = 1.0f;
 
-    public int score = 0;
-    public int highScore = 0;
+    public int score;
+    public int highScore;
     public Text scoreText;
     public Text highScoreText;
 
@@ -47,7 +47,7 @@ public class Board : MonoBehaviour
         scoreText.text = score.ToString();
         if (PlayerPrefs.HasKey("HighScore"))
         {
-            highScore = PlayerPrefs.GetInt("Highscore", 0);
+            highScore = PlayerPrefs.GetInt("HighScore", 0);
             highScoreText.text = highScore.ToString();
         }
         SetNextTile();
