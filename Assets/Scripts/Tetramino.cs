@@ -26,5 +26,4 @@ public struct TetraminoTile
     {
         this.cells = CellData.Cells[this.tetramino];
     }
-
 }
