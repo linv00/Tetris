@@ -9,10 +9,10 @@ public class Piece : MonoBehaviour
     public TetraminoTile data { get; set; }
     public Vector3Int[] cells { get; set; }
     public Vector3Int position { get; set; }
-    public int tetraNum;
 
     bool isInit = false;
     private float timer = 0;
+
     private bool moveDown = false;
     private int isRotate = -1;
 
@@ -59,14 +59,14 @@ public class Piece : MonoBehaviour
         {
             timer += 5*Time.deltaTime;
         }
-        if (!Waited(1)) return;
-        else
+        if (isInit)
         {
-            if (isInit)
+            if (!Waited(this.board.speed)) return;
+            else
             {
                 Step();
+                timer = 0;
             }
-            timer = 0;
         }
     }
 
@@ -76,7 +76,12 @@ public class Piece : MonoBehaviour
         newPosition.y--;
         if (board.IsValidPos(newPosition, this))
             UpdateTile(newPosition);
-        else return;
+        else
+        {
+            UpdateTile(position);
+            this.board.speed *= 0.995f;
+            board.Spawn();
+        }
     }
 
     public void MoveRight()
@@ -85,7 +90,10 @@ public class Piece : MonoBehaviour
         newPosition.x++;
         if (board.IsValidPos(newPosition, this))
             UpdateTile(newPosition);
-        else return;
+        else
+        {
+            UpdateTile(position);
+        }
     }
 
     public void MoveLeft()
@@ -94,7 +102,10 @@ public class Piece : MonoBehaviour
         newPosition.x--;
         if (board.IsValidPos(newPosition, this))
             UpdateTile(newPosition);
-        else return;
+        else
+        {
+            UpdateTile(position);
+        }
     }
 
     public void MoveDown()
@@ -112,7 +123,6 @@ public class Piece : MonoBehaviour
         this.board.Clear(this);
         Vector3Int[] cell = new Vector3Int[this.cells.Length];
 
- 
         if (this.data.tetramino != Tetraminos.O)
         {
             for (int i = 0; i < this.cells.Length; i++)
@@ -139,12 +149,13 @@ public class Piece : MonoBehaviour
             UpdateTile(position);
             if (this.data.tetramino != Tetraminos.L && this.data.tetramino != Tetraminos.J && this.data.tetramino != Tetraminos.T)
                 isRotate *= -1;
-        }   
+        }
         else
         {
             this.cells = cell;
             this.board.Set(this);
             return;
         }
+
     }
 }
