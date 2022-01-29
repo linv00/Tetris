@@ -24,6 +24,22 @@ public struct TetraminoTile
 
     public void Initialize()
     {
-        this.cells = CellData.Cells[this.tetramino];
+        int scale = ((CellData.mode) ? CellData.classicScale : CellData.chaoticScale);
+        cells = new Vector2Int[scale * scale * CellData.Cells[this.tetramino].Length];
+        for (int i = 0; i < CellData.Cells[this.tetramino].Length*scale*scale; i++)
+        {
+            cells[i] = Vector2Int.zero;
+        }
+        for (int i = 0; i < CellData.Cells[this.tetramino].Length; i++)
+        {
+            for (int j = 0; j < scale; j++)
+            {
+                for (int a = 0; a < scale; a++)
+                {
+                    cells[scale * scale * i + scale * j + a].x = CellData.Cells[this.tetramino][i].x*scale + j;
+                    cells[scale * scale * i + scale * j + a].y = CellData.Cells[this.tetramino][i].y*scale + a;
+                }
+            }
+        }
     }
 }
