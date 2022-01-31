@@ -197,15 +197,17 @@ public class Piece : MonoBehaviour
                     cell[i].x = x;
                     cell[i].y = y;
                 }
+
+                if (board.IsValidPos(position, cell))
+                {
+                    this.cells = cell;
+                    if (this.data.tetramino != Tetraminos.L && this.data.tetramino != Tetraminos.J && this.data.tetramino != Tetraminos.T)
+                        isRotate *= -1;
+                }
+                board.Set(this);
             }
 
-            if (board.IsValidPos(position, cell))
-            {
-                this.cells = cell;       
-                if (this.data.tetramino != Tetraminos.L && this.data.tetramino != Tetraminos.J && this.data.tetramino != Tetraminos.T)
-                    isRotate *= -1;
-            }
-            board.Set(this);
+            
         }
     }
 }

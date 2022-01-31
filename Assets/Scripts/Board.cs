@@ -165,7 +165,7 @@ public class Board : MonoBehaviour
         int check;
         Vector3Int position = Vector3Int.zero;
         int i = lowerBorder;
-        while (i <= rightBorder)
+        while (i <= upperBorder)
         { 
             check = 0;
             position.y = i;
