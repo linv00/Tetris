@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ClassicModeScene: MonoBehaviour
+public class ChaoticModeScene : MonoBehaviour
 {
     public void Awake()
     {
-        CellData.mode = true;
+        CellData.mode = false;
     }
     public void ReturnMenu()
     {

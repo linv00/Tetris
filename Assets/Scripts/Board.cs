@@ -10,23 +10,29 @@ public class Board : MonoBehaviour
     public TetraminoTile[] tetraminos;
     public Piece activePiece { get; set; }
     public Piece nextPiece { get; set; }
-    public Vector3Int spawnPosition = new Vector3Int (4, 0, 0);
-    public Vector3Int nextPieceSpawnPosition = new Vector3Int(12, 17, 0);
+    public Vector3Int spawnPosition;
+    public Vector3Int nextPieceSpawnPosition;
 
 
-    public int leftBorder = 0;
-    public int rightBorder = 9;
-    public int upperBorder = 19;
-    public int lowerBorder = 0;
+    public int leftBorder;
+    public int rightBorder;
+    public int upperBorder;
+    public int lowerBorder;
 
-    public float speed = 1.0f;
+    public float speed;
+    public float moveSpeed;
 
     public int score;
     public int highScore;
+    string record;
     public Text scoreText;
     public Text highScoreText;
 
+    public Text gameOver;
+    public bool game = true;
 
+    public GameObject grid;
+    public int scale;
 
     private void Awake()
     {
@@ -39,15 +45,44 @@ public class Board : MonoBehaviour
         {
             this.tetraminos[i].Initialize();
         }
-    }
+
+        if (CellData.mode)
+        {
+            scale = CellData.classicScale;
+        }
+        else
+        {
+            scale = CellData.chaoticScale;
+        }
+        grid.transform.localScale = new Vector3((float)1/scale, (float)1/scale, (float)1/scale);
+        leftBorder = 0 * scale;
+        rightBorder = 10 * scale;
+        upperBorder = 20 * scale;
+        lowerBorder = 0 * scale;
+        spawnPosition = new Vector3Int(4 * scale, 21 * scale, 0);
+        nextPieceSpawnPosition = new Vector3Int(12 * scale, 17 * scale, 0);
+        tilemap.gameObject.transform.localPosition = new Vector3Int(-7 * scale, -8 * scale, 0);
+        speed = 1.0f / scale;
+        moveSpeed = 0.3f / scale;
+
+}
 
     private void Start()
     {
         score = 0;
         scoreText.text = score.ToString();
-        if (PlayerPrefs.HasKey("HighScore"))
+        gameOver.text = "";
+        if (CellData.mode) record = "HighScoreClassic";
+        else record = "HighScoreChaotic";
+
+        if (PlayerPrefs.HasKey(record))
         {
-            highScore = PlayerPrefs.GetInt("HighScore", 0);
+            highScore = PlayerPrefs.GetInt(record, 0);
+            highScoreText.text = highScore.ToString();
+        }
+        else
+        {
+            highScore = score;
             highScoreText.text = highScore.ToString();
         }
         SetNextTile();
@@ -76,10 +111,19 @@ public class Board : MonoBehaviour
     {
         for (int i = 0; i < piece.cells.Length; i++)
         {
-             Vector3Int currentPosition = piece.cells[i] + piece.position;
-             this.tilemap.SetTile(currentPosition, piece.data.tile);
+            Vector3Int currentPosition = piece.cells[i] + piece.position;
+            if(currentPosition.y < upperBorder)
+            {
+                this.tilemap.SetTile(currentPosition, piece.data.tile);
+            }
         }
+    }
 
+    public void GameOver()
+    {
+        game = false;
+        tilemap.gameObject.layer = 1;
+        gameOver.text = "GAME OVER";
     }
 
     public void Clear(Piece piece)
@@ -100,7 +144,7 @@ public class Board : MonoBehaviour
             this.tilemap.SetTile(position, null);
         }
 
-        Vector3Int newPosition = new Vector3Int(0, 0, 0);
+        Vector3Int newPosition = Vector3Int.zero;
         for (int i = y + 1; i <= upperBorder; i++)
         {
             position.y = i;
@@ -119,9 +163,9 @@ public class Board : MonoBehaviour
     public void CheckLine()
     {
         int check;
-        Vector3Int position = new Vector3Int(0, 0, 0);
+        Vector3Int position = Vector3Int.zero;
         int i = lowerBorder;
-        while (i <= rightBorder)
+        while (i <= upperBorder)
         { 
             check = 0;
             position.y = i;
@@ -132,7 +176,7 @@ public class Board : MonoBehaviour
                     check++;
             }
 
-            if (check == 10)
+            if (check == 10*scale)
             {
                 this.ClearLine(i);
                 score += 10;
@@ -141,7 +185,7 @@ public class Board : MonoBehaviour
                 {
                     highScore = score;
                     highScoreText.text = highScore.ToString();
-                    PlayerPrefs.SetInt("HighScore", highScore);
+                    PlayerPrefs.SetInt(record, highScore);
                     PlayerPrefs.Save();
                 }
             }
@@ -149,20 +193,49 @@ public class Board : MonoBehaviour
         }
     }
 
-    public bool IsValidPos(Vector3Int position, Piece piece)
+    public bool IsValidPos(Vector3Int position, Piece piece)  // для движения
     {
         Vector3Int currentPosition;
-        Clear(activePiece);
+        Clear(activePiece); 
         for (int i = 0; i < piece.cells.Length; i++)
         {
             currentPosition = piece.cells[i] + position;
-            if (currentPosition.x <= leftBorder || currentPosition.x >= rightBorder)
+            if (currentPosition.x < leftBorder || currentPosition.x >= rightBorder)
                 return false;
-            if (currentPosition.y >= upperBorder || currentPosition.y <= lowerBorder)
+            if (currentPosition.y < lowerBorder)
                 return false;
             if (this.tilemap.HasTile(currentPosition))
                 return false;
         }
         return true;
+    }
+
+    public bool IsValidPos(Vector3Int position, Vector3Int[] cells)  // для поворота
+    {
+        Vector3Int currentPosition;
+        Clear(activePiece);
+        for (int i = 0; i < cells.Length; i++)
+        {
+            currentPosition = cells[i] + position;
+            if (currentPosition.x < leftBorder || currentPosition.x >= rightBorder)
+                return false;
+            if (currentPosition.y < lowerBorder)
+                return false;
+            if (this.tilemap.HasTile(currentPosition))
+                return false;
+        }
+        return true;
+    }
+
+    public bool IsGameOver()
+    {
+        Vector3Int position = Vector3Int.zero;
+        position.y = upperBorder - 1;
+        for (int i = leftBorder; i <= rightBorder; i++)
+        {
+            position.x = i;
+            if (this.tilemap.HasTile(position)) return true;
+        }
+        return false;
     }
 }

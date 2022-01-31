@@ -8,6 +8,11 @@ public static class CellData
     public static float[] rotateRightMatrix = new float[] { Mathf.Cos(angle), Mathf.Sin(angle), -Mathf.Sin(angle), Mathf.Cos(angle)};
     public static float[] rotateLeftMatrix = new float[] { Mathf.Cos(angle), -Mathf.Sin(angle), Mathf.Sin(angle), Mathf.Cos(angle) };
 
+
+    public static bool mode;
+    public static int classicScale = 1;
+    public static int chaoticScale = 5;
+
     public static readonly Dictionary<Tetraminos, Vector2Int[]> Cells = new Dictionary<Tetraminos, Vector2Int[]>()
     {
         { Tetraminos.L, new Vector2Int[] { new Vector2Int( -1, -1), new Vector2Int( -1, 0), new Vector2Int( 0, 0), new Vector2Int( 1, 0) } },
