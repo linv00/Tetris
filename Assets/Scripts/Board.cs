@@ -7,6 +7,7 @@ using UnityEngine.Tilemaps;
 public class Board : MonoBehaviour
 {
     public Tilemap tilemap { get; set; }
+    //public List<TetraminoTile> tetraminos = new List<TetraminoTile>();
     public TetraminoTile[] tetraminos;
     public Piece activePiece { get; set; }
     public Piece nextPiece { get; set; }
@@ -41,9 +42,24 @@ public class Board : MonoBehaviour
         this.nextPiece = this.gameObject.AddComponent<Piece>();
         nextPiece.enabled = false;
 
-        for (int i = 0; i < this.tetraminos.Length; i++)
+        int i = 0;
+        int deleted = 0;
+        while (i < tetraminos.Length)
         {
-            this.tetraminos[i].Initialize();
+            if (CellData.Available.Contains(((Tetraminos)(i+deleted)).ToString()))
+            {
+               
+                tetraminos[i].Initialize();       
+            }
+            else
+            {
+                List<TetraminoTile> tmp = new List<TetraminoTile>(tetraminos);
+                tmp.RemoveAt(i);
+                tetraminos = tmp.ToArray();
+                deleted++;
+                continue;
+            }
+            i++;
         }
 
         if (CellData.mode)
@@ -72,8 +88,12 @@ public class Board : MonoBehaviour
         score = 0;
         scoreText.text = score.ToString();
         gameOver.text = "";
-        if (CellData.mode) record = "HighScoreClassic";
-        else record = "HighScoreChaotic";
+        if (!CellData.mode) record = "HighScoreChaotic";
+        else
+        {
+            if (CellData.blockMode) record = "HighScoreBlock";
+            else record = "HighScoreClassic";
+        }
 
         if (PlayerPrefs.HasKey(record))
         {
@@ -101,9 +121,9 @@ public class Board : MonoBehaviour
     {
         if (nextPiece.cells != null) 
             Clear(nextPiece);
-        int rand = Random.Range(0, this.tetraminos.Length);
-        TetraminoTile newTile = this.tetraminos[rand];
-        this.nextPiece.Initialize(this, this.nextPieceSpawnPosition, newTile);
+        int rand = Random.Range(0, tetraminos.Length);
+        TetraminoTile newTile = tetraminos[rand];
+        nextPiece.Initialize(this, nextPieceSpawnPosition, newTile);
         Set(nextPiece);
     }
 

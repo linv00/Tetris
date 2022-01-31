@@ -10,8 +10,10 @@ public static class CellData
 
 
     public static bool mode;
+    public static bool blockMode;
     public static int classicScale = 1;
     public static int chaoticScale = 5;
+
 
     public static readonly Dictionary<Tetraminos, Vector2Int[]> Cells = new Dictionary<Tetraminos, Vector2Int[]>()
     {
@@ -23,4 +25,7 @@ public static class CellData
         { Tetraminos.I, new Vector2Int[] { new Vector2Int( -1, 0), new Vector2Int( 0, 0), new Vector2Int( 1, 0), new Vector2Int( 2, 0) } },
         { Tetraminos.O, new Vector2Int[] { new Vector2Int( 1, -1), new Vector2Int( 0, -1), new Vector2Int( 1, 0), new Vector2Int( 0, 0) } },
     };
+
+    public static List<string> Available = new List<string>();
+
 }

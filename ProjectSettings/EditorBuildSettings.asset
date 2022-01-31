@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/ChaoticModeScene.unity
     guid: 0e0c98cf5904d2a44a8bf8d11588ea84
   - enabled: 1
-    path: Assets/Scenes/BlockModeScene.unity
+    path: Assets/Scenes/ChooseBlockScene.unity
     guid: 5e06d613200f06b4f98da67f1821f376
+  - enabled: 1
+    path: Assets/Scenes/BlockModeScene.unity
+    guid: 0bbec13bb26183f4a947ea3cadc53412
   m_configObjects: {}
